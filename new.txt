@@ -1,0 +1,9 @@
+1.server address
+https://news.naver.com
+
+
+2. API Path
+/main/list.naver
+
+3. Query parameter
+?mode=LSD&mid=sec&sid1=101
