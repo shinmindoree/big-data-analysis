@@ -53,6 +53,31 @@ def fetch_news_list(datestr, page):
 
     return buffer
 
+def parse_media_info(soup):
+    media_info = soup.find('div', {'class': 'media_end_head_info_datestamp'})
+    if media_info:
+        datestr_list = media_info.find_all('span', {'class':'media_end_head_info_datestamp_time'})
+        link = media_info.find('a', {'class': 'media_end_head_origin_link'})
+        source_url = link['href'] if link else ''
+        return datestr_list, source_url
+    
+    else:
+        RuntimeError()
+
+
+def parse_datestr(span):
+
+    if span.has_attr('data-date-time'):
+        datestr = span['data-date-time']
+    elif span.has_attr('data-modify-date-time'):
+        datestr = span['data-modify-date-time']
+    else:
+        return None
+    
+    date = dt.datetime.fromisoformat(datestr)
+
+    return date
+
 
 def fetch_news_body(url):
     resp = requests.get(url)
@@ -72,11 +97,50 @@ def fetch_news_body(url):
         publisher = tokens[0].strip()
     else:
         raise RuntimeError()
-    
 
- 
-    print(title)
-    print(publisher)
+    datestr_list, source_url = parse_media_info(soup)
+    
+    if len(datestr_list) == 1:
+        created_at = parse_datestr(datestr_list[0])
+        updated_at = created_at
+    elif len(datestr_list) == 2:
+        created_at = parse_datestr(datestr_list[0])
+        updated_at = parse_datestr(datestr_list[1])
+    else:
+        raise RuntimeError()  
+    
+    body = soup.find('div', {'id': 'newsct_article'})
+
+    assert body is not None
+
+    body_text = body.text.strip()
+    
+    images = body.find_all('img')
+    image_urls = [x.get('src') or x.get('data-src') for x in images]
+    image_urls = list(set(image_urls))
+
+    # print(title)
+    # print(publisher)
+    # print(source_url)
+    # print(created_at)
+    # print(updated_at)
+    # print(images_urls)
+
+    entry = {
+        'title': title,
+        'section': 'economy',
+        'naver_url': url,
+        'source_url': source_url,
+        'image_urls': image_urls,
+        'publisher': publisher,
+        'created_at': created_at.isoformat(),
+        'updated_at': updated_at.isoformat(),
+        'body': body_text,
+        }
+    
+    print(entry)
+    
+    return entry
 
     pdb.set_trace()
     pass
