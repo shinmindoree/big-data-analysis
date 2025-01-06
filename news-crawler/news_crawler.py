@@ -3,11 +3,13 @@
 import pdb # python debugger
 import datetime as dt
 import requests
+import json
+import time
 
 from dateutil.relativedelta import relativedelta
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
-
+from config import *
 
 NAVER_URL = 'https://news.naver.com/main/list.naver?mode=LSD&mid=sec&sid1=101'
 NAVER_HEADERS = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0' }
@@ -138,12 +140,35 @@ def fetch_news_body(url):
         'body': body_text,
         }
     
-    print(entry)
+    # print(entry)
+
+    # pdb.set_trace()
     
     return entry
 
-    pdb.set_trace()
-    pass
+def check_if_doc_existing(doc_id):
+    url = f"{OPENSEARCH_URL}/news/_doc/{doc_id}"
+
+    resp = requests.get(
+        url = url,
+        auth = OPENSEARCH_AUTH,
+    )
+
+    return resp.status_code == 200
+
+
+def upload_news_doc(doc_id, body):
+    url = f"{OPENSEARCH_URL}/news/_doc/{doc_id}"
+
+    resp = requests.put(
+        url = url,
+        headers = OPENSEARCH_HEADERS,
+        auth = OPENSEARCH_AUTH,
+        data = json.dumps(body),
+    )
+
+    assert resp.status_code >=200 and resp.status_code < 300
+
 
 def fetch_news_list_for_date(date):
     datestr = date.strftime('%Y%m%d')
@@ -158,15 +183,21 @@ def fetch_news_list_for_date(date):
         for doc_id, title, url in items:
             print(f"[{doc_id}] {title}")
             
+            if check_if_doc_existing(doc_id):
+                continue
+
+
             body = fetch_news_body(url)
         
-            pdb.set_trace()
+            upload_news_doc(doc_id, body)
 
+            # time.sleep(1)
+        
 
 if __name__ == '__main__':
-    base_date = dt.datetime(2024, 9, 1)
+    base_date = dt.datetime(2024, 12, 24)
 
-    for d in range(10):
+    for d in range(1):
         date = base_date + relativedelta(days=d)
 
         fetch_news_list_for_date(date)

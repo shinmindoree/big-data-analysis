@@ -1,0 +1,23 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: mindoree
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: news-api-server
+
+provider:
+  name: aws
+  runtime: python3.12
+  region : ap-northeast-2
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - httpApi:
+          path: /
+          method: get
+  news_trends:
+    handler: services.news_trends.main
+    events:
+      - httpApi:
+          path: /news_trends # api path
+          method: get

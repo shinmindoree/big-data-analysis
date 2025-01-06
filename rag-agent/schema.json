@@ -1,0 +1,30 @@
+{
+    "settings": {
+        "index": {
+            "knn": true
+        }
+    },
+    "mappings": {
+        "properties": {
+            "date": {
+                "type": "date",
+                "format": "date_optional_time"
+            },
+            "title": {
+                "type": "text"
+            },
+            "summary": {
+                "type": "text"
+            },
+            "embed": {
+                "type": "knn_vector",
+                "dimension": 3072,
+                "method": {
+                  "name": "hnsw",
+                  "engine": "nmslib",
+                  "space_type": "innerproduct"
+                }
+            }
+        }
+    }
+}
