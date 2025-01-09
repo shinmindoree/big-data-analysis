@@ -14,7 +14,6 @@ langchain-core==0.3.28
 langchain-openai==0.2.14
 langsmith==0.2.6
 numpy==2.2.1
-openai==1.58.1
 orjson==3.10.12
 packaging==24.2
 pandas==2.2.3
@@ -34,3 +33,5 @@ tqdm==4.67.1
 typing_extensions==4.12.2
 tzdata==2024.2
 urllib3==2.3.0
+shortuuid
+openai

@@ -1,6 +1,7 @@
 
 news-crawler/config.py
 rag-agent/config.py
+news-api-server/config.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

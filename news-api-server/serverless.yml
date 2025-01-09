@@ -3,10 +3,26 @@ org: mindoree
 # "service" is the name of this project. This will also be added to your AWS resource names.
 service: news-api-server
 
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
 provider:
   name: aws
   runtime: python3.12
-  region : ap-northeast-2
+  region: ap-northeast-2
+  timeout: 10
+  environment:
+    OPENAI_API_KEY: sk-ZPZcyYToFiOq_kjx7FIIQ-l_MaeQOWKGcHyo0FOJ_oT3BlbkFJbaGwVK3kYUUyERmlZQUsBWRTtOrDEtFKS7z7tkz_MA
+
+package:
+  exclude:
+    - node_modules/**
+    - venv/**
+
 
 functions:
   hello:
@@ -19,5 +35,11 @@ functions:
     handler: services.news_trends.main
     events:
       - httpApi:
-          path: /news_trends # api path
+          path: /news-trends # api path
           method: get
+  kakao_callback:
+    handler: services.kakao_callback.main
+    events:
+      - httpApi:
+          path: /kakao-callback
+          method: post
