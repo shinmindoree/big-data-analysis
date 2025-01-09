@@ -1,4 +1,5 @@
 
+config.py
 news-crawler/config.py
 rag-agent/config.py
 news-api-server/config.py
